@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "imap-simple": "^5.1.0",
+    "install": "^0.13.0",
+    "mongodb": "^6.4.0",
+    "mongoose": "^8.2.1",
+    "node-cron": "^3.0.3",
+    "node-imap": "^0.9.6",
+    "nodemon": "^3.1.0",
+    "npm": "^10.5.0",
+    "ws": "^8.16.0"
+  }
+}
