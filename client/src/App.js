@@ -1,22 +1,21 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./pages/Layout";
+import Home from "./pages/Home";
+import Emails from "./pages/Emails";
 import CriticalMails from "./components/emails/CriticalMails";
-import TauxClotureG from "./components/taux_cloture/TauxClotureG";
-import Navbar from "./components/Navbar";
-import DashboardSection from "./components/DashboardSection";
 
 function App() {
   return (
-    <div>
-      <header>
-        <Navbar />
-      </header>
-      <main className="flex mx-20">
-        <DashboardSection>
-          <TauxClotureG />
-        </DashboardSection>
-      </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="emails" element={<Emails />} />
+        </Route>
+      </Routes>
       <CriticalMails />
-    </div>
+    </BrowserRouter>
   );
 }
 

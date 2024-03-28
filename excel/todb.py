@@ -8,18 +8,14 @@ def tostr(dec,key):
 
 
 client = MongoClient('mongodb://127.0.0.1:27017/')
-db = client['mydatabase']  
-collection = db['crtl_emails']  
+db = client['stfixe']  
+collection = db['dbbrises']  
 
 # Path to the Excel file
-excel_file = "C:/Users/AL-STEIN/Desktop/stage/dashboard/excel/DBBRISE.xlsx"
+excel_file = "C:/Users/AL-STEIN/Desktop/stage/dashboard/excel/dbbrise.xlsx"
 
 # Read Excel file into a pandas DataFrame
 df = pd.read_excel(excel_file)
-
-# =====================================================================
-# ==== NOTE THAT I HAVE ERROR : NaTType does not support utcoffset ====
-# =====================================================================
 
 # Convert DataFrame to a list of dictionaries (each dictionary represents a row)
 data = df.to_dict(orient='records')

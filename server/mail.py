@@ -34,19 +34,23 @@ IMAP_SERVER = 'devhubstation.com'
 IMAP_PORT = 993
 
 # Connect to the IMAP server
-mail = imaplib.IMAP4_SSL(IMAP_SERVER)
-mail.login(EMAIL, PASSWORD)
-mail.select('inbox')
+try:
+    mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+    mail.login(EMAIL, PASSWORD)
+    mail.select('inbox')
+    logger.info(f'connected to {EMAIL}')
+except Exception as e:
+    logger.error(f'Cannot connect to email: {e}')
 
-# WebSocket server URL
-WS_SERVER = 'ws://localhost:8080'
-
-# Connect to the WebSocket server
-ws = websocket.create_connection(WS_SERVER)
+try:
+    ws = websocket.create_connection('ws://localhost:8080')
+    logger.info('websocket connected on ws://localhost:8080')
+except Exception as e:
+    logger.error(f'websocket error: {e}')
 
 # MongoDB connection
 client = MongoClient('mongodb://127.0.0.1:27017/')
-db = client['mydatabase']
+db = client['stfixe']
 collection = db['crtl_emails']
 
 try:

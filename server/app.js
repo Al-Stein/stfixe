@@ -5,9 +5,9 @@ const WebSocket = require("ws");
 const mongoose = require("mongoose");
 var ObjectId = require("mongodb").ObjectId;
 
-// Connect to MongoDB ===========================================================================================
-const mongoURI = "mongodb://127.0.0.1:27017/mydatabase";
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+// Connect to MongoDB ====================================================================================
+const mongoURI = "mongodb://127.0.0.1:27017/stfixe";
+mongoose.connect(mongoURI);
 const db = mongoose.connection;
 db.on("error", (error) => console.error("MongoDB connection error:", error));
 db.once("open", () => console.log("Connected to MongoDB"));
@@ -48,23 +48,23 @@ wss.on("connection", function connection(ws) {
 
 // Express Server =============================================================================================
 const app = express();
-app.use(cors());
-app.use(express.static(path.join(__dirname, "build")));
+const server = express();
+server.use(cors());
+// app.use(express.static(path.join(__dirname, "build")));
 
-// // Serve index.html on all routes
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "build", "index.html"));
-// });
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../client/public", "index.html"));
-// });
+// Serve index.html on all routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 const DbBriseModel = require("./models/DbBrise");
 const CrtlEmailModel = require("./models/CrtlEmailModel");
-app.get("/Taux-cloture", async (req, res) => {
+server.get("/Taux-cloture", async (req, res) => {
   try {
     const data = await DbBriseModel.aggregate([
-      { $match: { "Week Cloture": { $ne: NaN } } },
+      {
+        $match: { "Week Cloture": { $ne: NaN }, "Year Cloture": { $eq: 2024 } },
+      },
       { $group: { _id: "$Week Cloture", some: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
@@ -74,10 +74,15 @@ app.get("/Taux-cloture", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-app.get("/Taux-ouverture", async (req, res) => {
+server.get("/Taux-ouverture", async (req, res) => {
   try {
     const data = await DbBriseModel.aggregate([
-      { $match: { "Week Creation": { $ne: NaN } } },
+      {
+        $match: {
+          "Week Creation": { $ne: NaN },
+          "Year Creation": { $eq: 2024 },
+        },
+      },
       { $group: { _id: "$Week Creation", some: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
@@ -87,7 +92,7 @@ app.get("/Taux-ouverture", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-app.get("/crtl-mails", async (req, res) => {
+server.get("/crtl-mails", async (req, res) => {
   try {
     const data = await CrtlEmailModel.find();
     res.json(data);
@@ -96,7 +101,19 @@ app.get("/crtl-mails", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-app.put("/see-mail/:id", async (req, res) => {
+server.get("/unseen", async (req, res) => {
+  try {
+    const data = await CrtlEmailModel.find(
+      { seen: false },
+      { "id connexion": 1 }
+    );
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+server.put("/see-mail/:id", async (req, res) => {
   try {
     await CrtlEmailModel.updateOne(
       { _id: new ObjectId(req.params.id) },
@@ -110,6 +127,9 @@ app.put("/see-mail/:id", async (req, res) => {
 });
 // Start the Express server-------------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 3005;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+// app.listen(3000, () => {
+//   console.log(`app is running on port 3000`);
+// });
